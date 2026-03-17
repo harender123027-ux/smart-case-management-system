@@ -1,0 +1,54 @@
+# Dependencies
+**/node_modules/
+**/package-lock.json
+
+# Environment Variables
+**/.env
+**/.env.local
+**/.env.*.local
+
+# Build & Output
+**/dist/
+**/dist-ssr/
+**/web-build/
+**/build/
+**/public/BNS.pdf
+**/public/BNSS.pdf
+**/public/BSA.pdf
+
+# Expo & Mobile
+**/.expo/
+**/expo-env.d.ts
+**/ios/
+**/android/
+**/*.jks
+**/*.p8
+**/*.p12
+**/*.key
+**/*.mobileprovision
+
+# Backend specific
+**/uploads/
+**/brain/
+
+# Logs
+**/logs/
+**/*.log
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+**/pnpm-debug.log*
+
+# IDE & OS
+**/.vscode/
+**/.idea/
+**/.DS_Store
+**/*.suo
+**/*.ntvs*
+**/*.njsproj
+**/*.sln
+**/*.sw?
+
+# AI generated files
+**/.gemini/
+**/temp/
