@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from '../i18n/translations';
 import { Shield, Lock, User, Globe, AlertCircle } from 'lucide-react';
@@ -6,6 +7,7 @@ import { motion } from 'framer-motion';
 import api from '../services/api';
 
 const LoginScreen = () => {
+  const navigate = useNavigate();
   const { login, language, toggleLanguage } = useAuth();
   const { t } = useTranslation(language);
   const [username, setUsername] = useState('');
@@ -20,13 +22,30 @@ const LoginScreen = () => {
     try {
       const res = await api.post('/auth/login', { username, password });
       const { token, user } = res.data;
-      // Store token inside the user object so the api interceptor can read it
       login({ ...user, token, name: user.full_name || user.username });
+      navigate('/');
     } catch (err) {
-      const msg = err.response?.data?.error || 'Login failed. Please check your credentials.';
+      // Offline / demo fallback for GitHub Pages deployment
+      if (username === 'admin' && password === 'password' && err.code !== 'ERR_BAD_RESPONSE') {
+        login({
+          id: 1,
+          username: 'admin',
+          name: 'Administrator',
+          full_name: 'Administrator',
+          role: 'admin',
+          badge_number: 'ADM-001',
+          station: 'Headquarters',
+          token: 'demo-token-offline',
+        });
+        navigate('/');
+        return;
+      }
+      const msg = err.response?.data?.error || 'Login failed. Check credentials.';
       setError(msg);
     } finally {
-      setLoading(false);
+      if (window.location.hash !== '#/') {
+        setLoading(false);
+      }
     }
   };
 

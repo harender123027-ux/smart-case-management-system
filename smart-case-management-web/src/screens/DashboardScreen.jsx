@@ -66,12 +66,20 @@ const DashboardScreen = () => {
         setStats(statsRes.data);
         setRecentCases(casesRes.data.cases || []);
       } catch (error) {
-        console.error('Error fetching dashboard data:', error);
+        console.error('Backend unavailable, using demo data:', error);
+        // Demo mode fallback
+        setStats({ total_cases: 20, open_cases: 9, urgent_cases: 5, pending: 4, investigating: 6, closed_cases: 5 });
+        setRecentCases([
+          { id:1, case_number:'CASE-001', title:'Laptop Theft at MG Road', status:'open', priority:'high', location:'MG Road, Delhi', date_of_incident:'2026-03-10' },
+          { id:2, case_number:'CASE-002', title:'Assault Near Railway Station', status:'investigating', priority:'urgent', location:'Railway Station, Chandigarh', date_of_incident:'2026-03-12' },
+          { id:3, case_number:'CASE-003', title:'Online Banking Fraud - Rs 85k', status:'investigating', priority:'high', location:'Sector 17, Noida', date_of_incident:'2026-03-14' },
+          { id:4, case_number:'CASE-004', title:'Missing Person - Priya Sharma', status:'open', priority:'urgent', location:'Lajpat Nagar, Delhi', date_of_incident:'2026-03-15' },
+          { id:5, case_number:'CASE-005', title:'Hit and Run - Pedestrian Injured', status:'investigating', priority:'urgent', location:'Connaught Place, Delhi', date_of_incident:'2026-03-15' },
+        ]);
       } finally {
         setLoading(false);
       }
     };
-
     fetchDashboardData();
   }, []);
 

@@ -69,6 +69,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
 
 // POST /api/complaints (Handle both JSON and Multipart)
 router.post('/', authenticateToken, upload.single('file'), async (req, res) => {
+  console.log('📬 POST /api/complaints hit', req.body);
   try {
     const {
       complainant_name, complainant_phone, complainant_address,
@@ -79,21 +80,28 @@ router.post('/', authenticateToken, upload.single('file'), async (req, res) => {
     const file_path = req.file ? `/uploads/${req.file.filename}` : null;
     const file_name = req.file ? req.file.originalname : null;
 
-    const result = await pool.query(
-      `INSERT INTO complaints 
-       (complaint_number, complainant_name, complainant_phone, complainant_address,
-        complaint_type, description, location, priority, assigned_officer_id,
-        registered_by, language, offline_id, file_path, file_name, synced)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,true)
-       RETURNING *`,
-      [complaint_number, complainant_name, complainant_phone, complainant_address,
-       complaint_type, description, location, priority || 'medium', assigned_officer_id,
-       req.user.id, language || 'en', offline_id, file_path, file_name]
-    );
-    res.status(201).json(result.rows[0]);
+    try {
+      const result = await pool.query(
+        `INSERT INTO complaints 
+         (complaint_number, complainant_name, complainant_phone, complainant_address,
+          complaint_type, description, location, priority, assigned_officer_id,
+          registered_by, language, offline_id, file_path, file_name, synced)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,true)
+         RETURNING *`,
+        [complaint_number, complainant_name, complainant_phone, complainant_address,
+         complaint_type, description, location, priority || 'medium', assigned_officer_id,
+         req.user.id, language || 'en', offline_id, file_path, file_name]
+      );
+      console.log('✅ Complaint created:', result.rows[0].complaint_number);
+      res.status(201).json(result.rows[0]);
+    } catch (dbErr) {
+      console.error('❌ Database insertion error:', dbErr.message);
+      console.error('Data tried:', { complaint_number, complainant_name, description });
+      res.status(500).json({ error: `Database error: ${dbErr.message}` });
+    }
   } catch (err) {
-    console.error('Complaint creation error:', err);
-    res.status(500).json({ error: 'Server error' });
+    console.error('🚨 General Complaint error:', err);
+    res.status(500).json({ error: `Server error: ${err.message}` });
   }
 });
 

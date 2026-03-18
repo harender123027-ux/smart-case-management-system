@@ -120,9 +120,7 @@ const ComplaintScreen = () => {
         formData.append('file', selectedFile);
       }
 
-      await api.post('/complaints', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      await api.post('/complaints', formData);
       
       setSuccess(true);
       setTimeout(() => setSuccess(false), 5000);
@@ -138,7 +136,8 @@ const ComplaintScreen = () => {
       setSelectedFile(null);
     } catch (err) {
       console.error('Submission error:', err);
-      alert('Error registering complaint. Please try again.');
+      const msg = err.response?.data?.error || err.message || 'Error registering complaint.';
+      alert(`${msg}. Please try again.`);
     } finally {
       setLoading(false);
     }
@@ -237,6 +236,37 @@ const ComplaintScreen = () => {
         </div>
 
         <aside className="form-sidebar">
+          <section className="sidebar-section glass">
+            <h3 className="sidebar-title">{t('type')}</h3>
+            <div className="type-grid">
+              {COMPLAINT_TYPES.map(type => (
+                <button
+                  key={type}
+                  type="button"
+                  className={`type-chip ${form.complaint_type === type ? 'selected' : ''}`}
+                  onClick={() => update('complaint_type', type)}
+                >
+                  {t(type)}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className="sidebar-section glass">
+            <h3 className="sidebar-title">{t('priority')}</h3>
+            <div className="priority-list">
+              {PRIORITIES.map(p => (
+                <PriorityBadge 
+                  key={p}
+                  priority={p} 
+                  active={form.priority === p}
+                  onClick={(val) => update('priority', val)}
+                  t={t}
+                />
+              ))}
+            </div>
+          </section>
+
           <section className="sidebar-section glass">
             <h3 className="sidebar-title">Evidence Upload</h3>
             <div className="file-upload">
